@@ -19,6 +19,18 @@ def get_conn():
     return conn
 
 
+_initialized = False
+
+
+def ensure_init():
+    """Idempotent safety net: creates tables on first use if init_db() wasn't
+    called yet (e.g. a fresh deployment with no existing platform.db)."""
+    global _initialized
+    if not _initialized:
+        init_db()
+        _initialized = True
+
+
 def init_db():
     conn = get_conn()
     conn.execute(
@@ -51,6 +63,7 @@ def init_db():
 # ---------------- Registrations ----------------
 
 def add_registration(email, full_name, phone, method, reference, amount):
+    ensure_init()
     conn = get_conn()
     conn.execute(
         """
@@ -71,6 +84,7 @@ def add_registration(email, full_name, phone, method, reference, amount):
 
 
 def get_registration(email):
+    ensure_init()
     conn = get_conn()
     row = conn.execute(
         "SELECT * FROM registrations WHERE email = ?", (email.strip().lower(),)
@@ -80,6 +94,7 @@ def get_registration(email):
 
 
 def list_registrations():
+    ensure_init()
     conn = get_conn()
     rows = conn.execute(
         "SELECT * FROM registrations ORDER BY created_at DESC"
@@ -89,6 +104,7 @@ def list_registrations():
 
 
 def set_unlocked(email, unlocked: bool):
+    ensure_init()
     conn = get_conn()
     conn.execute(
         "UPDATE registrations SET unlocked = ?, unlocked_at = ? WHERE email = ?",
@@ -101,6 +117,7 @@ def set_unlocked(email, unlocked: bool):
 # ---------------- Settings (logos, textes) ----------------
 
 def set_setting(key, value):
+    ensure_init()
     conn = get_conn()
     conn.execute(
         "INSERT INTO settings (key, value) VALUES (?, ?) "
@@ -112,6 +129,7 @@ def set_setting(key, value):
 
 
 def get_setting(key, default=None):
+    ensure_init()
     conn = get_conn()
     row = conn.execute("SELECT value FROM settings WHERE key = ?", (key,)).fetchone()
     conn.close()

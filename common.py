@@ -6,6 +6,11 @@ import db
 LOGO_DIR = os.path.join(os.path.dirname(__file__), "assets")
 os.makedirs(LOGO_DIR, exist_ok=True)
 
+# Garantit que les tables SQLite existent dès que ce module est importé,
+# quelle que soit la page (corrige "no such table: settings" sur un
+# déploiement neuf, ex. Streamlit Cloud).
+db.init_db()
+
 PRIMARY = "#0B5FA5"   # bleu SCSM
 ACCENT = "#F2A900"    # or / jaune Lab_Math
 
