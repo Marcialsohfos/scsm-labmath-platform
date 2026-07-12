@@ -12,9 +12,13 @@ render_sidebar()
 db.init_db()
 
 # Mot de passe : variable d'environnement ADMIN_PASSWORD, ou secrets.toml, avec repli de démo.
-ADMIN_PASSWORD = os.environ.get(
-    "ADMIN_PASSWORD", st.secrets.get("ADMIN_PASSWORD", "changeme123") if hasattr(st, "secrets") else "changeme123"
-)
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+if not ADMIN_PASSWORD:
+    try:
+        ADMIN_PASSWORD = st.secrets.get("ADMIN_PASSWORD", "labsurv32015@20001c")
+    except Exception:
+        ADMIN_PASSWORD = "labsurv32015@20001c"
+
 
 st.title(t("admin_title"))
 
