@@ -78,7 +78,7 @@ with contact_col:
     st.subheader(t("contact_title"))
     st.markdown(
         "📞 674 65 18 56 / 691 13 32 53\n\n"
-        "📞 678 07 18 81 / 663 43 34 87 / 692 52 81 36\n\n"
+        "📞 678 07 18 81 / 697 55 47 21\n\n"
         "✉️ scsmaubma@gmail.com\n\n"
         "🌐 scsmaubmar.org\n\n"
         "Lab_Math : labmathscsmaubmarorg.netlify.app"

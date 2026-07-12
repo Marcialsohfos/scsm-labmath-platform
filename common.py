@@ -218,6 +218,6 @@ def render_sidebar():
         st.page_link("pages/4_Admin.py", label=t("nav_admin"), icon="🛠️")
         st.divider()
         st.caption("📞 674 65 18 56 / 691 13 32 53")
-        st.caption("📞 678 07 18 81 / 663 43 34 87")
+        st.caption("📞 678 07 18 81 / 697 55 47 21")
         st.caption("✉️ scsmaubma@gmail.com")
         st.caption("🌐 scsmaubmar.org")
