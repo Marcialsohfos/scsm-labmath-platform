@@ -21,11 +21,10 @@ with col_local:
         <div class="payment-box">
         <b>{t('momo_label')} (MTN)</b><br>
         📱 674 65 18 56<br>
-        📱 691 13 32 53<br><br>
+        📱 678 07 18 81<br><br>
         <b>{t('om_label')} (Orange)</b><br>
-        📱 678 07 18 81<br>
-        📱 663 43 34 87<br>
-        📱 692 52 81 36
+        📱 697 55 47 21<br>
+        📱 691 13 32 53<br>
         </div>
         """,
         unsafe_allow_html=True,
