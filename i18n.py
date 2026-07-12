@@ -200,6 +200,80 @@ TRANSLATIONS = {
     "admin_logout": {"fr": "Se déconnecter", "en": "Log out"},
     "status_unlocked": {"fr": "Débloqué ✅", "en": "Unlocked ✅"},
     "status_pending": {"fr": "En attente ⏳", "en": "Pending ⏳"},
+
+    # ---------- Modules & contenus pédagogiques (Admin) ----------
+    "admin_modules_title": {"fr": "📚 Modules & contenus pédagogiques", "en": "📚 Modules & learning content"},
+    "admin_modules_help": {
+        "fr": "Ajoutez, réordonnez ou supprimez des modules, puis publiez pour chacun des vidéos, "
+              "cours en texte, PDF, sandbox R/Python et quiz. Tout apparaît instantanément dans "
+              "l'espace des candidats débloqués.",
+        "en": "Add, reorder or delete modules, then publish videos, text lessons, PDFs, R/Python "
+              "sandboxes and quizzes for each one. Everything appears instantly in unlocked "
+              "candidates' learning space.",
+    },
+    "admin_add_module": {"fr": "➕ Ajouter un nouveau module", "en": "➕ Add a new module"},
+    "module_title_fr": {"fr": "Titre du module (FR)", "en": "Module title (FR)"},
+    "module_title_en": {"fr": "Titre du module (EN)", "en": "Module title (EN)"},
+    "module_desc_fr": {"fr": "Description (FR)", "en": "Description (FR)"},
+    "module_desc_en": {"fr": "Description (EN)", "en": "Description (EN)"},
+    "admin_add_module_button": {"fr": "Créer le module", "en": "Create module"},
+    "module_title_required": {"fr": "Le titre (FR) du module est obligatoire.", "en": "The module title (FR) is required."},
+    "admin_module_added": {"fr": "✅ Module créé avec succès.", "en": "✅ Module created successfully."},
+    "admin_no_modules": {
+        "fr": "Aucun module pour le moment. Créez votre premier module ci-dessus.",
+        "en": "No modules yet. Create your first module above.",
+    },
+    "admin_edit_module": {"fr": "✏️ Modifier ce module", "en": "✏️ Edit this module"},
+    "admin_save_changes": {"fr": "Enregistrer les modifications", "en": "Save changes"},
+    "admin_add_content": {"fr": "Publier du contenu dans ce module", "en": "Publish content in this module"},
+    "resource_video": {"fr": "Vidéo", "en": "Video"},
+    "resource_text": {"fr": "Cours en texte", "en": "Text lesson"},
+    "resource_pdf": {"fr": "PDF", "en": "PDF"},
+    "resource_sandbox": {"fr": "Sandbox R/Python", "en": "R/Python sandbox"},
+    "resource_quiz": {"fr": "Quiz", "en": "Quiz"},
+    "resource_title_label": {"fr": "Titre de la ressource", "en": "Resource title"},
+    "resource_video_url_label": {"fr": "Lien vidéo externe (YouTube/Vimeo, optionnel)", "en": "External video link (YouTube/Vimeo, optional)"},
+    "resource_video_file_label": {"fr": "Ou charger un fichier vidéo (mp4/webm/mov)", "en": "Or upload a video file (mp4/webm/mov)"},
+    "resource_video_missing": {"fr": "Ajoutez un lien vidéo ou un fichier vidéo.", "en": "Add a video link or a video file."},
+    "admin_publish": {"fr": "📤 Publier", "en": "📤 Publish"},
+    "admin_content_published": {"fr": "✅ Contenu publié dans l'espace des candidats.", "en": "✅ Content published in the candidates' space."},
+    "resource_text_content_label": {"fr": "Contenu du cours (Markdown accepté)", "en": "Lesson content (Markdown supported)"},
+    "resource_text_missing": {"fr": "Le contenu du cours ne peut pas être vide.", "en": "Lesson content cannot be empty."},
+    "resource_pdf_file_label": {"fr": "Charger un fichier PDF", "en": "Upload a PDF file"},
+    "resource_pdf_missing": {"fr": "Veuillez charger un fichier PDF.", "en": "Please upload a PDF file."},
+    "resource_sandbox_language_label": {"fr": "Langage", "en": "Language"},
+    "resource_sandbox_starter_label": {"fr": "Code de départ (affiché au candidat)", "en": "Starter code (shown to the candidate)"},
+    "resource_quiz_num_questions": {"fr": "Nombre de questions", "en": "Number of questions"},
+    "resource_quiz_question": {"fr": "Question", "en": "Question"},
+    "resource_quiz_question_label": {"fr": "Énoncé de la question", "en": "Question text"},
+    "resource_quiz_options_label": {"fr": "Options de réponse (une par ligne)", "en": "Answer options (one per line)"},
+    "resource_quiz_options_help": {"fr": "Saisissez chaque option de réponse sur une ligne séparée.", "en": "Enter each answer option on a separate line."},
+    "resource_quiz_correct_label": {"fr": "N° de la bonne réponse", "en": "Correct answer number"},
+    "resource_quiz_missing": {
+        "fr": "Chaque question doit avoir un énoncé et au moins 2 options.",
+        "en": "Each question needs text and at least 2 options.",
+    },
+    "admin_existing_content": {"fr": "Contenu déjà publié", "en": "Already published content"},
+
+    # ---------- Modules & contenus pédagogiques (Espace candidat) ----------
+    "space_no_modules": {
+        "fr": "Aucun module n'a encore été publié par l'administrateur. Revenez bientôt !",
+        "en": "No module has been published by the administrator yet. Check back soon!",
+    },
+    "resource_completed": {"fr": "Terminé", "en": "Completed"},
+    "resource_video_unavailable": {"fr": "Vidéo non disponible.", "en": "Video not available."},
+    "resource_mark_done": {"fr": "✅ Marquer comme terminé", "en": "✅ Mark as completed"},
+    "resource_download_pdf": {"fr": "⬇️ Télécharger le PDF", "en": "⬇️ Download PDF"},
+    "resource_pdf_unavailable": {"fr": "Fichier PDF non disponible.", "en": "PDF file not available."},
+    "resource_sandbox_editor_label": {"fr": "Éditeur de code", "en": "Code editor"},
+    "resource_sandbox_run": {"fr": "Exécuter le code", "en": "Run code"},
+    "resource_sandbox_running": {"fr": "Exécution en cours…", "en": "Running…"},
+    "resource_sandbox_success": {"fr": "✅ Code exécuté avec succès.", "en": "✅ Code ran successfully."},
+    "resource_quiz_unavailable": {"fr": "Quiz non disponible.", "en": "Quiz not available."},
+    "resource_quiz_pick_answer": {"fr": "Choisissez une réponse", "en": "Pick an answer"},
+    "resource_quiz_submit": {"fr": "Valider mes réponses", "en": "Submit my answers"},
+    "resource_quiz_result": {"fr": "Résultat", "en": "Result"},
+    "resource_quiz_last_score": {"fr": "Dernier score enregistré", "en": "Last recorded score"},
 }
 
 
