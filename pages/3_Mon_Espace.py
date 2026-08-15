@@ -1,6 +1,8 @@
 import os
 import json
+import base64
 import streamlit as st
+import streamlit.components.v1 as components
 from i18n import t, init_lang
 from common import apply_base_style, render_sidebar, module_title, module_description
 import db
@@ -129,10 +131,41 @@ if active_email:
                         if result:
                             if result["stdout"]:
                                 st.code(result["stdout"], language="text")
+
+                            artifacts = result.get("artifacts", [])
+                            for idx, art in enumerate(artifacts):
+                                if art["type"] == "image":
+                                    st.image(
+                                        base64.b64decode(art["data"]),
+                                        caption=art["filename"],
+                                        use_container_width=True,
+                                    )
+                                elif art["type"] == "html":
+                                    # Cartes leaflet/folium, widgets htmlwidgets, plotly, etc.
+                                    components.html(art["data"], height=520, scrolling=True)
+                                elif art["type"] == "pdf":
+                                    st.download_button(
+                                        f"📄 {art['filename']}",
+                                        data=base64.b64decode(art["data"]),
+                                        file_name=art["filename"],
+                                        mime="application/pdf",
+                                        key=f"dlart_{r['id']}_{idx}",
+                                    )
+
                             if result["stderr"]:
                                 st.error(result["stderr"])
                             if result["ok"] and not result["stderr"]:
                                 st.success(t("resource_sandbox_success"))
+                            if result["ok"] and not result["stdout"] and not artifacts:
+                                st.info(
+                                    "Le code s'est exécuté sans erreur mais n'a produit aucune sortie "
+                                    "visible. Pensez à afficher vos résultats avec print()/cat(), ou à "
+                                    "enregistrer vos graphiques/cartes dans un fichier avant la fin du "
+                                    "script — ex. plt.savefig('graphique.png'), m.save('carte.html') en "
+                                    "Python, ou ggsave('graphique.png'), "
+                                    "htmlwidgets::saveWidget(m, 'carte.html') en R. Ces fichiers "
+                                    "s'afficheront alors automatiquement ici."
+                                )
 
                     # ---------------- Quiz ----------------
                     elif r["type"] == "quiz":
