@@ -2,7 +2,10 @@ import os
 import json
 import streamlit as st
 from i18n import t, init_lang
-from common import apply_base_style, render_sidebar, LOGO_DIR, MODULE_FILES_DIR, module_title, RESOURCE_ICONS
+from common import (
+    apply_base_style, render_sidebar, LOGO_DIR, MODULE_FILES_DIR, module_title, RESOURCE_ICONS,
+    module_dataset_dir, list_module_datasets,
+)
 import db
 
 st.set_page_config(page_title="Admin — SCSM Group · Lab_Math", page_icon="🛠️", layout="wide")
@@ -241,6 +244,41 @@ for i, m in enumerate(modules):
 
         # ---- Sandbox R / Python ----
         with tabs[3]:
+            st.markdown(
+                "**📂 Jeux de données du module** — déposés ici, ces fichiers sont "
+                "automatiquement copiés dans chaque exécution de sandbox R/Python de "
+                "ce module, donc `read_excel(\"patients_bertoua.xlsx\")` fonctionne "
+                "directement, sans que l'apprenant ait à uploader quoi que ce soit."
+            )
+            existing_datasets = list_module_datasets(m["id"])
+            if existing_datasets:
+                for fname in existing_datasets:
+                    dcol1, dcol2 = st.columns([5, 1])
+                    with dcol1:
+                        st.caption(f"📄 {fname}")
+                    with dcol2:
+                        if st.button("🗑️", key=f"deldata_{m['id']}_{fname}"):
+                            os.remove(os.path.join(module_dataset_dir(m["id"]), fname))
+                            st.rerun()
+            else:
+                st.caption("Aucun fichier de données déposé pour ce module pour l'instant.")
+
+            data_files = st.file_uploader(
+                "Ajouter des fichiers de données (.xlsx, .xls, .csv, .json, .txt)",
+                type=["xlsx", "xls", "csv", "json", "txt"],
+                accept_multiple_files=True,
+                key=f"data_{m['id']}",
+            )
+            if data_files:
+                if st.button("📤 Enregistrer ces fichiers de données", key=f"datapub_{m['id']}"):
+                    dest_dir = module_dataset_dir(m["id"])
+                    for df in data_files:
+                        with open(os.path.join(dest_dir, df.name), "wb") as f:
+                            f.write(df.getbuffer())
+                    st.success("✅ Fichiers de données enregistrés.")
+                    st.rerun()
+
+            st.divider()
             s_title = st.text_input(t("resource_title_label"), key=f"st_{m['id']}")
             s_lang = st.selectbox(
                 t("resource_sandbox_language_label"), ["python", "r"],

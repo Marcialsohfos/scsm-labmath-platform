@@ -4,7 +4,10 @@ import base64
 import streamlit as st
 import streamlit.components.v1 as components
 from i18n import t, init_lang
-from common import apply_base_style, render_sidebar, module_title, module_description
+from common import (
+    apply_base_style, render_sidebar, module_title, module_description,
+    module_dataset_dir, list_module_datasets,
+)
 import db
 import sandbox
 import translate
@@ -121,6 +124,40 @@ if active_email:
                     elif r["type"] == "sandbox":
                         st.caption(f"{t('resource_sandbox_language_label')} : {'Python' if r['language']=='python' else 'R'}")
 
+                        # Fichiers de données déposés par l'admin pour ce module (ex.
+                        # patients_bertoua.xlsx) : copiés automatiquement dans le
+                        # répertoire de travail du sandbox à chaque exécution, donc
+                        # read_excel("patients_bertoua.xlsx") fonctionne tel quel.
+                        module_datasets = list_module_datasets(m["id"])
+                        if module_datasets:
+                            st.caption(
+                                (f"📂 Fichiers de données disponibles dans ce sandbox : "
+                                 f"{', '.join(module_datasets)}")
+                                if lang == "fr" else
+                                (f"📂 Data files available in this sandbox: "
+                                 f"{', '.join(module_datasets)}")
+                            )
+
+                        # Upload optionnel : fichiers propres à l'apprenant (en plus de
+                        # ceux du module ci-dessus), utiles pour un exercice où chacun
+                        # travaille sur son propre jeu de données. Conservés en mémoire
+                        # de session le temps de la session (pas sur disque).
+                        with st.expander(
+                            "📎 Ajouter mes propres fichiers de données (optionnel)"
+                            if lang == "fr" else
+                            "📎 Add my own data files (optional)"
+                        ):
+                            own_files = st.file_uploader(
+                                "Fichiers (.xlsx, .csv, .json, .txt)" if lang == "fr"
+                                else "Files (.xlsx, .csv, .json, .txt)",
+                                type=["xlsx", "xls", "csv", "json", "txt"],
+                                accept_multiple_files=True,
+                                key=f"upl_{r['id']}",
+                            )
+                            st.session_state[f"extra_files_{r['id']}"] = (
+                                {f.name: f.getvalue() for f in own_files} if own_files else {}
+                            )
+
                         # Seuls les commentaires du code de départ sont traduits (jamais le
                         # code exécutable). On ne réinitialise l'éditeur avec la version
                         # traduite QUE si l'apprenant n'a pas encore touché au code, pour ne
@@ -144,7 +181,11 @@ if active_email:
                         with run_col:
                             if st.button(f"▶️ {t('resource_sandbox_run')}", key=f"run_{r['id']}", type="primary"):
                                 with st.spinner(t("resource_sandbox_running")):
-                                    result = sandbox.run_code(r["language"], st.session_state[code_key])
+                                    result = sandbox.run_code(
+                                        r["language"], st.session_state[code_key],
+                                        dataset_dir=module_dataset_dir(m["id"]),
+                                        extra_files=st.session_state.get(f"extra_files_{r['id']}"),
+                                    )
                                 st.session_state[f"result_{r['id']}"] = result
                         with done_col:
                             if not completed:
