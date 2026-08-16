@@ -99,6 +99,17 @@ def init_db():
         )
         """
     )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS translation_cache (
+            hash TEXT PRIMARY KEY,
+            lang TEXT,
+            source_text TEXT,
+            translated_text TEXT,
+            created_at TEXT
+        )
+        """
+    )
     conn.commit()
     conn.close()
 
@@ -381,3 +392,32 @@ def module_progress_ratio(email, module_id):
     ).fetchone()["c"]
     conn.close()
     return done, total
+
+
+# ---------------- Translation cache ----------------
+# Utilisé par translate.py pour ne jamais retraduire deux fois le même texte :
+# le premier apprenant qui consulte un contenu en anglais déclenche l'appel au
+# service de traduction, tous les suivants lisent directement ce cache (instantané).
+
+def get_cached_translation(text_hash):
+    ensure_init()
+    conn = get_conn()
+    row = conn.execute(
+        "SELECT translated_text FROM translation_cache WHERE hash = ?", (text_hash,)
+    ).fetchone()
+    conn.close()
+    return row["translated_text"] if row else None
+
+
+def set_cached_translation(text_hash, lang, source_text, translated_text):
+    ensure_init()
+    conn = get_conn()
+    conn.execute(
+        """
+        INSERT OR REPLACE INTO translation_cache (hash, lang, source_text, translated_text, created_at)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        (text_hash, lang, source_text, translated_text, datetime.utcnow().isoformat()),
+    )
+    conn.commit()
+    conn.close()

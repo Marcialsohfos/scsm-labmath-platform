@@ -151,6 +151,13 @@ def apply_base_style():
             font-size: 0.72rem;
             animation: fadeIn 0.4s ease-out;
         }}
+
+        /* Masque le menu de navigation automatique de Streamlit (liste des pages
+           générée depuis /pages) : on garde uniquement le menu personnalisé
+           (logos + langue + liens) rendu par render_sidebar(). */
+        [data-testid="stSidebarNav"] {{
+            display: none;
+        }}
         </style>
         """,
         unsafe_allow_html=True,

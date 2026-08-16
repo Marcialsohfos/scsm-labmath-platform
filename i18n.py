@@ -274,6 +274,23 @@ TRANSLATIONS = {
     "resource_quiz_submit": {"fr": "Valider mes réponses", "en": "Submit my answers"},
     "resource_quiz_result": {"fr": "Résultat", "en": "Result"},
     "resource_quiz_last_score": {"fr": "Dernier score enregistré", "en": "Last recorded score"},
+    "resource_sandbox_no_output": {
+        "fr": (
+            "Le code s'est exécuté sans erreur mais n'a produit aucune sortie visible. Pensez à "
+            "afficher vos résultats avec print()/cat(), ou à enregistrer vos graphiques/cartes "
+            "dans un fichier avant la fin du script — ex. plt.savefig('graphique.png'), "
+            "m.save('carte.html') en Python, ou ggsave('graphique.png'), "
+            "htmlwidgets::saveWidget(m, 'carte.html') en R. Ces fichiers s'afficheront alors "
+            "automatiquement ici."
+        ),
+        "en": (
+            "The code ran without error but produced no visible output. Remember to display your "
+            "results with print()/cat(), or to save your charts/maps to a file before the script "
+            "ends — e.g. plt.savefig('chart.png'), m.save('map.html') in Python, or "
+            "ggsave('chart.png'), htmlwidgets::saveWidget(m, 'map.html') in R. Those files will "
+            "then be displayed here automatically."
+        ),
+    },
 }
 
 
