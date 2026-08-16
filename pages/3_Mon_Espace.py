@@ -7,12 +7,19 @@ from i18n import t, init_lang
 from common import apply_base_style, render_sidebar, module_title, module_description
 import db
 import sandbox
+import translate
 
 st.set_page_config(page_title="Mon espace — SCSM Group · Lab_Math", page_icon="🔐", layout="wide")
 init_lang()
 apply_base_style()
 render_sidebar()
 db.init_db()
+
+# Langue active — sert à déclencher la traduction automatique (voir translate.py)
+# de tout le contenu pédagogique qui n'existe qu'en français en base (cours,
+# code de départ des sandbox, quiz). Les modules eux-mêmes restent bilingues
+# "en dur" via title_fr/title_en (voir common.py).
+lang = st.session_state.get("lang", "fr")
 
 st.title(t("space_title"))
 st.write(t("space_intro"))
@@ -63,11 +70,12 @@ if active_email:
                 for r in resources:
                     st.markdown('<div class="scsm-resource-row">', unsafe_allow_html=True)
                     completed = db.is_completed(active_email, r["id"])
-                    st.markdown(f"#### 🎬 {r['title']}" if r["type"] == "video" else
-                                f"#### 📖 {r['title']}" if r["type"] == "text" else
-                                f"#### 📑 {r['title']}" if r["type"] == "pdf" else
-                                f"#### 💻 {r['title']}" if r["type"] == "sandbox" else
-                                f"#### ❓ {r['title']}",
+                    r_title = translate.translate_text(r["title"] or "", lang)
+                    st.markdown(f"#### 🎬 {r_title}" if r["type"] == "video" else
+                                f"#### 📖 {r_title}" if r["type"] == "text" else
+                                f"#### 📑 {r_title}" if r["type"] == "pdf" else
+                                f"#### 💻 {r_title}" if r["type"] == "sandbox" else
+                                f"#### ❓ {r_title}",
                                 unsafe_allow_html=False)
                     if completed:
                         st.markdown(f"<span class='scsm-done-badge'>✓ {t('resource_completed')}</span>", unsafe_allow_html=True)
@@ -87,7 +95,7 @@ if active_email:
 
                     # ---------------- Cours en texte ----------------
                     elif r["type"] == "text":
-                        st.markdown(r["text_content"] or "")
+                        st.markdown(translate.translate_text(r["text_content"] or "", lang))
                         if not completed:
                             if st.button(t("resource_mark_done"), key=f"donet_{r['id']}"):
                                 db.mark_progress(active_email, r["id"])
@@ -112,9 +120,25 @@ if active_email:
                     # ---------------- Sandbox R / Python ----------------
                     elif r["type"] == "sandbox":
                         st.caption(f"{t('resource_sandbox_language_label')} : {'Python' if r['language']=='python' else 'R'}")
+
+                        # Seuls les commentaires du code de départ sont traduits (jamais le
+                        # code exécutable). On ne réinitialise l'éditeur avec la version
+                        # traduite QUE si l'apprenant n'a pas encore touché au code, pour ne
+                        # jamais écraser un travail en cours en changeant de langue.
+                        localized_starter = translate.translate_code_comments(r["starter_code"] or "", lang)
                         code_key = f"code_{r['id']}"
+                        seed_key = f"{code_key}__seed"
+                        seed_lang_key = f"{code_key}__seed_lang"
                         if code_key not in st.session_state:
-                            st.session_state[code_key] = r["starter_code"] or ""
+                            st.session_state[code_key] = localized_starter
+                            st.session_state[seed_key] = localized_starter
+                            st.session_state[seed_lang_key] = lang
+                        elif st.session_state.get(seed_lang_key) != lang:
+                            if st.session_state[code_key] == st.session_state.get(seed_key):
+                                st.session_state[code_key] = localized_starter
+                                st.session_state[seed_key] = localized_starter
+                            st.session_state[seed_lang_key] = lang
+
                         st.text_area(t("resource_sandbox_editor_label"), key=code_key, height=200)
                         run_col, done_col = st.columns([1, 1])
                         with run_col:
@@ -157,15 +181,7 @@ if active_email:
                             if result["ok"] and not result["stderr"]:
                                 st.success(t("resource_sandbox_success"))
                             if result["ok"] and not result["stdout"] and not artifacts:
-                                st.info(
-                                    "Le code s'est exécuté sans erreur mais n'a produit aucune sortie "
-                                    "visible. Pensez à afficher vos résultats avec print()/cat(), ou à "
-                                    "enregistrer vos graphiques/cartes dans un fichier avant la fin du "
-                                    "script — ex. plt.savefig('graphique.png'), m.save('carte.html') en "
-                                    "Python, ou ggsave('graphique.png'), "
-                                    "htmlwidgets::saveWidget(m, 'carte.html') en R. Ces fichiers "
-                                    "s'afficheront alors automatiquement ici."
-                                )
+                                st.info(t("resource_sandbox_no_output"))
 
                     # ---------------- Quiz ----------------
                     elif r["type"] == "quiz":
@@ -179,10 +195,12 @@ if active_email:
                             answers = {}
                             with st.form(f"quiz_form_{r['id']}"):
                                 for qi, q in enumerate(questions):
-                                    st.markdown(f"**{qi + 1}. {q['question']}**")
+                                    q_text = translate.translate_text(q["question"], lang)
+                                    q_options = [translate.translate_text(opt, lang) for opt in q["options"]]
+                                    st.markdown(f"**{qi + 1}. {q_text}**")
                                     answers[qi] = st.radio(
-                                        t("resource_quiz_pick_answer"), options=list(range(len(q["options"]))),
-                                        format_func=lambda idx, opts=q["options"]: opts[idx],
+                                        t("resource_quiz_pick_answer"), options=list(range(len(q_options))),
+                                        format_func=lambda idx, opts=q_options: opts[idx],
                                         key=f"quiz_{r['id']}_{qi}", label_visibility="collapsed",
                                     )
                                 submitted = st.form_submit_button(t("resource_quiz_submit"), type="primary")
