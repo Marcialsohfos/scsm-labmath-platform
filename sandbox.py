@@ -39,6 +39,28 @@ def _truncate(text):
     return text
 
 
+def _seed_data_files(tmp, dataset_dir=None, extra_files=None):
+    """Copie dans le répertoire de travail temporaire (tmp) les fichiers de
+    données que le script de l'apprenant doit pouvoir lire avec un simple
+    read_excel("nom.xlsx") / pd.read_excel("nom.xlsx") — sans chemin absolu.
+
+    - dataset_dir : dossier serveur (ex. data/datasets/<module_id>/) rempli par
+      l'admin depuis la page Admin — mêmes fichiers pour tous les apprenants.
+    - extra_files : dict {nom_fichier: bytes} pour des fichiers uploadés à la
+      volée par l'apprenant lui-même (st.file_uploader côté page), utile pour
+      des exercices où chacun travaille sur son propre fichier.
+    """
+    if dataset_dir and os.path.isdir(dataset_dir):
+        for name in os.listdir(dataset_dir):
+            src = os.path.join(dataset_dir, name)
+            if os.path.isfile(src):
+                shutil.copy2(src, os.path.join(tmp, name))
+    if extra_files:
+        for name, data in extra_files.items():
+            with open(os.path.join(tmp, name), "wb") as f:
+                f.write(data)
+
+
 def _collect_artifacts(tmp, script_path):
     """Récupère les fichiers (images, cartes HTML, PDF) que le script a écrits dans
     son dossier de travail — ex: plt.savefig(), m.save(), ggsave(), saveWidget(),
@@ -74,9 +96,10 @@ def _collect_artifacts(tmp, script_path):
     return artifacts
 
 
-def run_python(code: str):
+def run_python(code: str, dataset_dir=None, extra_files=None):
     """Exécute du code Python dans un sous-processus isolé avec timeout."""
     with tempfile.TemporaryDirectory() as tmp:
+        _seed_data_files(tmp, dataset_dir, extra_files)
         script_path = os.path.join(tmp, "candidate_script.py")
         with open(script_path, "w", encoding="utf-8") as f:
             f.write(code)
@@ -109,7 +132,7 @@ def r_available():
     return shutil.which("Rscript") is not None
 
 
-def run_r(code: str):
+def run_r(code: str, dataset_dir=None, extra_files=None):
     """Exécute du code R via Rscript si disponible sur le serveur, avec timeout."""
     if not r_available():
         return {
@@ -121,6 +144,7 @@ def run_r(code: str):
             ),
         }
     with tempfile.TemporaryDirectory() as tmp:
+        _seed_data_files(tmp, dataset_dir, extra_files)
         script_path = os.path.join(tmp, "candidate_script.R")
         with open(script_path, "w", encoding="utf-8") as f:
             f.write(code)
@@ -144,9 +168,9 @@ def run_r(code: str):
             return {"ok": False, "stdout": "", "stderr": str(e), "artifacts": []}
 
 
-def run_code(language: str, code: str):
+def run_code(language: str, code: str, dataset_dir=None, extra_files=None):
     if language == "python":
-        return run_python(code)
+        return run_python(code, dataset_dir, extra_files)
     elif language == "r":
-        return run_r(code)
+        return run_r(code, dataset_dir, extra_files)
     return {"ok": False, "stdout": "", "stderr": "Langage non supporté."}

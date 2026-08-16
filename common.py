@@ -9,6 +9,27 @@ os.makedirs(LOGO_DIR, exist_ok=True)
 MODULE_FILES_DIR = os.path.join(os.path.dirname(__file__), "data", "module_files")
 os.makedirs(MODULE_FILES_DIR, exist_ok=True)
 
+# Jeux de données (xlsx, csv, …) mis à disposition des sandbox R/Python de chaque
+# module — un sous-dossier par module_id. sandbox.py copie le contenu de ce
+# sous-dossier dans le répertoire de travail temporaire avant chaque exécution,
+# afin que read_excel("patients_bertoua.xlsx") etc. fonctionnent sans que
+# l'apprenant ait à uploader quoi que ce soit lui-même.
+DATASETS_DIR = os.path.join(os.path.dirname(__file__), "data", "datasets")
+os.makedirs(DATASETS_DIR, exist_ok=True)
+
+
+def module_dataset_dir(module_id):
+    """Chemin du dossier de datasets d'un module (créé à la demande)."""
+    d = os.path.join(DATASETS_DIR, str(module_id))
+    os.makedirs(d, exist_ok=True)
+    return d
+
+
+def list_module_datasets(module_id):
+    """Liste les fichiers de données déjà déposés pour un module (noms triés)."""
+    d = module_dataset_dir(module_id)
+    return sorted(f for f in os.listdir(d) if os.path.isfile(os.path.join(d, f)))
+
 # Garantit que les tables SQLite existent dès que ce module est importé,
 # quelle que soit la page (corrige "no such table: settings" sur un
 # déploiement neuf, ex. Streamlit Cloud).
